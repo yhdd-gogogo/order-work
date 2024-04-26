@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tjj.zj.tjjwork.mapper.CompanyMapper">
+
+    <insert id="bindingComp">
+        insert into zp_user_comp_map (company_id,user_id)
+        values(#{companyId},#{userId})
+    </insert>
+
+
+    <select id="findByPage" resultType="com.tjj.zj.tjjwork.entity.Company">
+        select
+        company_id,
+        company_name,
+        company_type,
+        company_scale,
+        phone_num,
+        create_time,
+        (case when status = '0' then '未审批'
+        when status = '1' then '已审批'
+        else status end) as status
+        from zp_comp_info
+        where 1=1
+
+        <if test="params.companyName!='' and params.companyName!=null  ">
+            and company_name like concat('%', #{params.companyName}, '%')
+        </if>
+
+        <if test="params.status!='' and params.status!=null">
+            and status = #{params.status}
+        </if>
+    </select>
+</mapper>

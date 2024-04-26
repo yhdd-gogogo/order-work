@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tjj.zj.tjjwork.mapper.RoleMapper">
+
+
+    <insert id="add" parameterType="com.tjj.zj.tjjwork.entity.Role">
+        insert into zp_role_info (role_id,role_name,role_description,create_time)
+        values(#{roleId}, #{roleName},#{roleDescription},#{createTime})
+    </insert>
+
+
+    <insert id="roleMenu">
+        insert into zp_role_menu_map (role_id,menu_code)
+        values (#{roleId},#{menuCode})
+    </insert>
+
+
+    <insert id="setRole">
+        insert into zp_user_role_map (user_id,role_id)
+        values (#{userId},#{roleId})
+    </insert>
+
+
+    <delete id="deleteRole">
+        delete from zp_user_role_map
+        where role_id = #{roleId}
+    </delete>
+
+    <select id="findByPage" resultType="com.tjj.zj.tjjwork.entity.Role">
+        select
+            role_id,
+            role_name,
+            role_description,
+            create_time
+        from zp_role_info
+        where 1=1
+        <if test="params.roleName !='' and params.roleName !=null" >
+            and role_name like concat ('%',#{params.roleName},'%')
+        </if>
+        order by create_time desc
+    </select>
+</mapper>

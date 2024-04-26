@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tjj.zj.tjjwork.mapper.UserMapper">
+
+    <insert id="addUser">
+        insert into zp_user_info (user_id,account,login_name,password,phone_num,user_type,user_status)
+        values(#{userId}, #{account},#{loginName},#{password},#{phoneNum},#{userType},#{userStatus})
+    </insert>
+
+
+    <select id="findByPage" resultType="com.tjj.zj.tjjwork.entity.User">
+        select
+            user_id,
+            account,
+            login_name,
+            phone_num,
+            (case when user_type = '1' then '学生用户'
+            when user_type = '2' then '商家用户'
+            else user_type end) as userType,
+            (case when user_status = '0' then '未激活'
+            when user_status = '1' then '已激活'
+            else user_status end) as userStatus
+        from zp_user_info
+        where 1=1
+
+        <if test="params.account!='' and params.account!=null  ">
+            and (account like  concat('%', #{params.account}, '%') or login_name like concat('%', #{params.account}, '%') )
+        </if>
+
+        <if test="params.userType!='' and params.userType!=null">
+            and user_type = #{params.userType}
+        </if>
+
+        <if test="params.userStatus!='' and params.userStatus!=null">
+            and user_status = #{params.userStatus}
+        </if>
+    </select>
+
+
+    <select id="userRoleMap" resultType="com.tjj.zj.tjjwork.dto.UserRoleDTO">
+        select * from zp_user_role_map
+        where user_id = #{userId}
+    </select>
+
+
+    <select id="roleMenuMap" resultType="com.tjj.zj.tjjwork.dto.RoleMenuDTO">
+        select * from zp_role_menu_map
+        where role_id = #{roleId}
+    </select>
+</mapper>

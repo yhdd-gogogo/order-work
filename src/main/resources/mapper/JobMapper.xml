@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0/EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tjj.zj.tjjwork.mapper.JobMapper">
+
+
+    <update id="approverUser">
+        update zp_apply_info
+        set work_status = #{isAgree}
+        where user_id = #{userId}
+          and job_id = #{jobId}
+    </update>
+
+
+    <update id="dealFeed">
+        update zp_feedback_info
+        set deal_time = #{dealTime},
+        deal_content = #{dealContent},
+        status = '1'
+        where job_id = #{jobId}
+    </update>
+
+
+    <select id="findByPage" resultType="com.tjj.zj.tjjwork.entity.Job">
+        select
+        company_id,
+        job_name,
+        job_type,
+        link_man,
+        phone_num,
+        release_time,
+        pay_way,
+        job_require,
+        (case when job_status = '0' then '未审批'
+        when job_status = '1' then '已批准'
+        when job_status = '2' then '已驳回'
+        else job_status end ) as jobStatus,
+        job_id
+        from zp_work_info
+        where 1=1
+
+        <choose>
+            <when test='userType.equals("2")'>
+                and company_id = #{companyId}
+            </when>
+        </choose>
+        order by release_time desc
+    </select>
+
+    <select id="userCompMap" resultType="com.tjj.zj.tjjwork.dto.UserCompDTO">
+        select *
+        from zp_user_comp_map
+        where user_id = #{userId}
+    </select>
+
+    <select id="userJob" resultType="com.tjj.zj.tjjwork.entity.UserJob">
+        select user_id,
+               user_name,
+               phone_num,
+               apply_time,
+               (case when work_status = '0' then '待审批'
+                   when work_status = '1' then '已录用'
+                   when work_status = '2' then '拒绝录用'
+                   else work_status end ) as workStatus
+        from zp_apply_info
+        where job_id = #{jobId}
+        order by apply_time desc
+--         and work_status = '0'
+    </select>
+
+    <select id="resumeUser" resultType="com.tjj.zj.tjjwork.dto.ResumeDTO">
+        select *
+        from zp_resume_info
+        where user_id = #{userId}
+    </select>
+
+    <select id="existJob" resultType="com.tjj.zj.tjjwork.entity.UserJob">
+        select *
+        from zp_apply_info
+        where user_id = #{userId}
+          and job_id = #{jobId}
+    </select>
+
+    <select id="userFindByPage" resultType="com.tjj.zj.tjjwork.entity.Job">
+        select
+        a.company_id,
+        a.job_name,
+        a.job_type,
+        a.link_man,
+        a.phone_num,
+        a.release_time,
+        a.pay_way,
+        a.job_require,
+        (case when a.job_status = '0' then '未审批'
+        when a.job_status = '1' then '已批准'
+        when a.job_status = '2' then '已驳回'
+        else a.job_status end ) as jobStatus,
+        a.job_id,
+        (case when b.work_status = '0' then '已报名'
+        when b.work_status = '1' then '已被录用'
+        when b.work_status = '2' then '已被拒绝'
+        else '未报名' end ) as workStatus
+        from zp_work_info a left  join zp_apply_info b
+        on  a.job_id = b.job_id and b.user_id = #{userId}
+        where a.job_status = '1'
+        <if test="params.jobName!='' and params.jobName!=null  ">
+            and a.job_name like concat('%', #{params.jobName}, '%')
+        </if>
+
+        <if test="params.payWay!='' and params.payWay!=null">
+            and a.pay_way = #{params.payWay}
+        </if>
+
+        <if test="params.sex!='' and params.sex!=null  ">
+            and a.job_require like concat('%', #{params.sex}, '%')
+        </if>
+
+        <if test="params.jobType!='' and params.jobType!=null  ">
+            and a.job_type =#{params.jobType}
+        </if>
+        order by a.release_time desc
+    </select>
+
+    <select id="applyList" resultType="com.tjj.zj.tjjwork.entity.UserJob">
+        select
+            company_id,
+            user_id,
+            user_name,
+            phone_num,
+            job_id,
+            apply_time,
+            (case when work_status = '0' then '已报名'
+                  when work_status = '1' then '已被录用'
+                  when work_status = '2' then '已被拒绝'
+                  else '未报名' end ) as workStatus
+        from zp_apply_info
+        where user_id = #{userId}
+        order by apply_time desc
+    </select>
+
+
+    <select id="jobComp" resultType="com.tjj.zj.tjjwork.dto.JobCompDTO">
+        select a.user_id,
+               a.job_id,
+               a.work_status,
+               b.job_name,
+               c.company_id,
+               c.company_name
+        from zp_apply_info a left join zp_work_info b on a.job_id = b.job_id
+                             left join zp_comp_info c on a.company_id = c.company_id
+        where  a.user_id = #{userId}  and a.job_id = #{jobId}
+    </select>
+
+
+    <select id="feedFindByPage" resultType="com.tjj.zj.tjjwork.entity.FeedBack">
+        select
+            user_id,
+            user_name,
+            job_id,
+            job_name,
+            company_id,
+            company_name,
+            phone_num,
+            (case when status = '0' then '待处理'
+                when status = '1' then '已处理'
+            else status end  ) as status,
+            content,
+            feedback_time,
+            deal_time,
+            deal_content
+        from zp_feedback_info
+        where user_id = #{userId}
+        <if test="params.backStatus!='' and params.backStatus!=null  ">
+            and status =#{params.backStatus}
+        </if>
+        order by feedback_time desc;
+    </select>
+
+    <select id="feedCompFindByPage" resultType="com.tjj.zj.tjjwork.entity.FeedBack">
+        select
+            user_id,
+            user_name,
+            job_id,
+            job_name,
+            company_id,
+            company_name,
+            phone_num,
+            (case when status = '0' then '待处理'
+                  when status = '1' then '已处理'
+                  else status end  ) as status,
+            content,
+            feedback_time,
+            deal_time,
+            deal_content
+        from zp_feedback_info
+        where 1=1
+        <choose>
+            <when test='userType.equals("2")'>
+                and company_id = #{companyId}
+            </when>
+        </choose>
+        order by feedback_time desc
+    </select>
+
+    <insert id="issueJob" parameterType="com.tjj.zj.tjjwork.entity.Job">
+        insert into zp_work_info (company_id, job_name, job_type, link_man, phone_num, release_time, pay_way,
+                                  job_require, job_status, job_id)
+        values (#{companyId}, #{jobName}, #{jobType}, #{linkMan}, #{phoneNum}, #{releaseTime}, #{payWay}, #{jobRequire},
+                #{jobStatus}, #{jobId})
+    </insert>
+
+    <insert id="applyJob" parameterType="com.tjj.zj.tjjwork.entity.UserJob">
+        insert into zp_apply_info (user_id, user_name, phone_num, job_id, apply_time, work_status, company_id)
+        values (#{userId}, #{userName}, #{phoneNum}, #{jobId}, #{applyTime}, #{workStatus}, #{companyId})
+    </insert>
+
+
+    <insert id="checkJobHistory" parameterType="com.tjj.zj.tjjwork.dto.CheckJobHisDTO">
+        insert into zp_check_job_his (job_id, operation, operation_time)
+        values (#{jobId}, #{operation}, #{operationTime})
+    </insert>
+
+
+    <insert id="feedbackJob" parameterType="com.tjj.zj.tjjwork.dto.JobCompDTO">
+        insert into zp_feedback_info (user_id, user_name, job_id,job_name,company_id,company_name,phone_num,status,content,feedback_time,deal_time)
+        values (#{userId}, #{userName}, #{jobId},#{jobName},#{companyId},#{companyName},#{phoneNum},#{status},#{content},#{feedbackTime},#{dealTime})
+    </insert>
+
+    <delete id="deleteJob" parameterType="string">
+        delete
+        from zp_work_info
+        where job_id = #{jobId}
+    </delete>
+
+    <delete id="deleteApply">
+        delete from zp_apply_info
+        where user_id = #{userId} and job_id = #{jobId}
+    </delete>
+</mapper>
