@@ -85,6 +85,7 @@
     <select id="userFindByPage" resultType="com.tjj.zj.tjjwork.entity.Job">
         select
         a.company_id,
+        a.company_name,
         a.job_name,
         a.job_type,
         a.link_man,
@@ -125,10 +126,12 @@
     <select id="applyList" resultType="com.tjj.zj.tjjwork.entity.UserJob">
         select
             company_id,
+            company_name,
             user_id,
             user_name,
             phone_num,
             job_id,
+            job_name,
             apply_time,
             (case when work_status = '0' then '已报名'
                   when work_status = '1' then '已被录用'
@@ -203,16 +206,31 @@
         order by feedback_time desc
     </select>
 
+
+    <select id="merchantJob" resultType="com.tjj.zj.tjjwork.dto.MerchantJobDTO">
+        select a.company_id,
+               a.company_name,
+               a.company_type,
+               a.company_scale,
+               a.phone_num,
+               a.create_time,
+               a.status,
+               b.user_id
+        from zp_comp_info a left join zp_user_comp_map b
+        on a.company_id = b.company_id
+        where b.user_id = #{loginId}
+    </select>
+
     <insert id="issueJob" parameterType="com.tjj.zj.tjjwork.entity.Job">
         insert into zp_work_info (company_id, job_name, job_type, link_man, phone_num, release_time, pay_way,
-                                  job_require, job_status, job_id)
+                                  job_require, job_status, job_id,company_name)
         values (#{companyId}, #{jobName}, #{jobType}, #{linkMan}, #{phoneNum}, #{releaseTime}, #{payWay}, #{jobRequire},
-                #{jobStatus}, #{jobId})
+                #{jobStatus}, #{jobId},#{companyName})
     </insert>
 
     <insert id="applyJob" parameterType="com.tjj.zj.tjjwork.entity.UserJob">
-        insert into zp_apply_info (user_id, user_name, phone_num, job_id, apply_time, work_status, company_id)
-        values (#{userId}, #{userName}, #{phoneNum}, #{jobId}, #{applyTime}, #{workStatus}, #{companyId})
+        insert into zp_apply_info (user_id, user_name, phone_num, job_id, apply_time, work_status, company_id,company_name,job_name)
+        values (#{userId}, #{userName}, #{phoneNum}, #{jobId}, #{applyTime}, #{workStatus}, #{companyId},#{companyName},#{jobName})
     </insert>
 
 

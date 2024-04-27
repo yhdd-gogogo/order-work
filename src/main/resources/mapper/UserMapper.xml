@@ -10,6 +10,16 @@
     </insert>
 
 
+    <update id="updateUser">
+        update zp_user_info
+        set login_name = #{loginName},
+            password = MD5(#{password}),
+            edu = #{edu},
+            phone_num = #{phoneNum}
+        where user_id = #{userId}
+    </update>
+
+
     <select id="findByPage" resultType="com.tjj.zj.tjjwork.entity.User">
         select
             user_id,

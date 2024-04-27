@@ -18,6 +18,10 @@ public class Job {
     @ApiModelProperty("企业统一信用代码")
     private String companyId;
 
+    @TableField("company_name")
+    @ApiModelProperty("企业名称")
+    private String companyName;
+
     @TableField("job_name")
     @ApiModelProperty("岗位名称")
     private String jobName;

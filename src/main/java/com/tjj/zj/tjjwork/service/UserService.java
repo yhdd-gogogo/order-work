@@ -21,4 +21,6 @@ public interface UserService {
     Object validUser(String accountId);
 
     Object detailUser(String userId);
+
+    Object updateUser(User user);
 }

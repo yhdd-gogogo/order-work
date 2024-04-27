@@ -24,4 +24,6 @@ public interface UserMapper extends BaseMapper<User> {
     UserRoleDTO userRoleMap(@Param(("userId")) String userId);
 
     List<RoleMenuDTO> roleMenuMap(@Param(("roleId")) String roleId);
+
+    Integer updateUser(User user);
 }

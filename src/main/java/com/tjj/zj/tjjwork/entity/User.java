@@ -31,6 +31,10 @@ public class User {
     @ApiModelProperty("密码")
     private String password;
 
+    @TableField("edu")
+    @ApiModelProperty("学历")
+    private String edu;
+
     @TableField("phone_num")
     @ApiModelProperty("手机号")
     private String phoneNum;

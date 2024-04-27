@@ -10,10 +10,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -62,5 +59,11 @@ public class UserController {
     @ApiOperation("查看用户")
     public Object detailUser(@RequestParam("userId") String userId) {
         return userService.detailUser(userId);
+    }
+
+    @PostMapping("/update")
+    @ApiOperation("修改信息")
+    public Object updateUser(@RequestBody User user) {
+        return userService.updateUser(user);
     }
 }

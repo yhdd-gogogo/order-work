@@ -30,9 +30,17 @@ public class UserJob {
     @ApiModelProperty("企业id")
     private String companyId;
 
+    @TableField("company_name")
+    @ApiModelProperty("企业名称")
+    private String companyName;
+
     @TableField("job_id")
     @ApiModelProperty("岗位id")
     private String jobId;
+
+    @TableField("job_name")
+    @ApiModelProperty("岗位名称")
+    private String jobName;
 
     @TableField("apply_time")
     @ApiModelProperty("报名时间")

@@ -79,4 +79,14 @@ public class UserServiceImpl implements UserService {
         return CommonResult.success(user);
 
     }
+
+    @Override
+    public Object updateUser(User user) {
+        Integer result = userMapper.updateUser(user);
+        if (result > 0 ) {
+            return CommonResult.success("修改成功");
+        }else {
+            return CommonResult.failed("修改失败");
+        }
+    }
 }

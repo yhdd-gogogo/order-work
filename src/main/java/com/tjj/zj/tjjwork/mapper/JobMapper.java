@@ -55,4 +55,6 @@ public interface JobMapper extends BaseMapper<Job> {
     Page<FeedBack> feedCompFindByPage(Page<FeedBack> page, @Param("params") Map<String, Object> params, @Param("userType")String userType, @Param("companyId")String companyId);
 
     void dealFeed(FeedBack feedBack);
+
+    MerchantJobDTO merchantJob(@Param(("loginId")) String loginId);
 }

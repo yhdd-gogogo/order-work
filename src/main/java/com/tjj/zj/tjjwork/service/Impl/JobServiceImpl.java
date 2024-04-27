@@ -117,9 +117,14 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Object issueJob(Job job) {
+        String loginId = RequestHolder.getRequest().getHeader("userId");
+//        User user = (User) RequestHolder.getRequest().getSession().getAttribute(Constant.USER);
+        MerchantJobDTO merchantJobDTO = jobMapper.merchantJob(loginId);
         String jobId = SimpleKeyUtil.genShortUuId();
         boolean jobExist = jobExist(jobId);
         if (jobExist) {
+            job.setCompanyId(merchantJobDTO.getCompanyId());
+            job.setCompanyName(merchantJobDTO.getCompanyName());
             job.setReleaseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
             job.setJobStatus("0");
             job.setJobId(jobId);
@@ -199,9 +204,6 @@ public class JobServiceImpl implements JobService {
         queryWrapper.eq("user_id",loginId);
         User user = userMapper.selectOne(queryWrapper);
         if (user.getUserType().equals("1")) { //个人用户
-            userJob.setApplyTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-            userJob.setWorkStatus("0");
-            userJob.setUserId(user.getUserId());
             UserJob existJob = jobMapper.existJob(user.getUserId(),userJob.getJobId());
             if (Objects.nonNull(existJob) && !existJob.getWorkStatus().equals("2")) {
                 //记录不为空且不是被拒绝的直接返回
@@ -209,6 +211,10 @@ public class JobServiceImpl implements JobService {
             }
             //删除报名记录重新报名
             jobMapper.deleteApply(user.getUserId(),userJob.getJobId());
+
+            userJob.setApplyTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+            userJob.setWorkStatus("0");
+            userJob.setUserId(user.getUserId());
             Integer result = jobMapper.applyJob(userJob);
             if (result > 0) {
                 return CommonResult.success("报名成功");
